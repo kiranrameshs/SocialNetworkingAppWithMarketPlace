@@ -1,3 +1,46 @@
-body{
-    background-color: bisque;
+#homepage{
+    text-align: center;
+}
+
+#signup{
+    text-align: right;
+    text-justify: distribute;
+}
+.btn-facebook {
+    background-color: #4aa1f3;
+    border-radius: 0%;
+    border: 0%;
+    color: #ffffff;
+    width: auto;
+}
+.btn-facebook:link,
+.btn-facebook :visited{
+    text-decoration: none;
+    background-color: #4aa1f3;
+    color: #ffffff;
+}
+.btn-gplus{
+    background-color: #e44b34;
+    border-radius: 0%;
+    border: 0%;
+    color: #ffffff;
+    width: auto;
+}
+.btn-gplus:link,
+.btn-gplus:visited{
+    text-decoration: none;
+    background-color: #e44b34;
+    color: #ffffff;
+}
+.btn-instagram{
+    background-color: rgb(195, 42, 163);
+    border-radius: 0%;
+    color: #ffffff;
+    width: auto;
+}
+.btn-instagram:link,
+.btn-instagram:visited{
+    text-decoration: none;
+    background-color:  rgb(195, 42, 163);
+    color: #ffffff;
 }
