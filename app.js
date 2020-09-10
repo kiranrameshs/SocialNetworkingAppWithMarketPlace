@@ -1,6 +1,8 @@
 // Load modules
 const express = require('express');
+const Handlebars = require('handlebars')
 const expbhs = require('express-handlebars');
+const {allowInsecurePrototypeAccess} = require('@handlebars/allow-prototype-access')
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
@@ -28,17 +30,21 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //Global variables for User
-// app.use( (req,res,next) => {
-//   res.locals.user = req.user || null;
-// });
+app.use( (req,res,next) => {
+  res.locals.user = req.user || null;
+  next();
+});
 
 
 // Template engine for view 
-app.engine('handlebars',expbhs({defaultLayout: 'main'}));
+app.engine('handlebars',expbhs({defaultLayout: 'main',
+handlebars: allowInsecurePrototypeAccess(Handlebars)}));
 app.set('view engine', 'handlebars');
 
 // Setup static files to store css, js, images
 app.use(express.static('public'));
+
+mongoose.Promise = global.Promise;
 
 //connect to remote db using keys imported above
 mongoose.connect(keys.MongoURI, {useNewUrlParser: true})
@@ -46,7 +52,7 @@ mongoose.connect(keys.MongoURI, {useNewUrlParser: true})
 {console.log(err)});
 
 
-mongoose.Promise = global.Promise;
+
 // server port set as env variable and for local port as 3000
 const port = process.env.PORT || 4000;
 
@@ -70,13 +76,20 @@ app.get('/auth/google/callback',
     res.redirect('/profile');
   });
 
-//   app.get('/profile',(req,res)=>{
-//     User.findById({_id: req.user._id}).then
-//     ((user) => {
-//       res.render('profile', {user: user});
-//     });
-// });
+  app.get('/profile',(req,res)=>{
+    User.findById({_id: req.user._id}).then
+    ((user) => {
+      res.render('profile', {user:user});
+    })
+});
 
+//Handle user logout
+app.get('/logout', (req, res) =>
+{
+  req.logOut();
+  res.redirect('/');
+})
+    
 //success message if server is running
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
