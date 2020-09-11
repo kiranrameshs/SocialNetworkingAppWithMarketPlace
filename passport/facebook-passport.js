@@ -37,7 +37,8 @@ passport.serializeUser(function(user, done) {
             fullName : profile.displayName,
             lastname : profile.name.familyName,
             firstname : profile.name.givenName,
-            image: `https://graph.facebook.com/${profile.id}/picture?type=large`
+            image: `https://graph.facebook.com/${profile.id}/picture?type=large`,
+            email: profile.emails[0].value
         }
         new User(newUser).save()
         .then((user)=>{

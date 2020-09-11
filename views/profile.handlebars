@@ -25,7 +25,18 @@
                  {{else}}
                  <form action="/addPhone" method="POST" class="form-inline">
                 <div class="form-group mb-2">
-                    <input type="number" class="form-control-plaintext" name="phone" value="123-456-7890" placeholder="Enter Phone Number">
+                    <input type="number" class="form-control-plaintext" name="phone" placeholder="Enter Phone Number  " required>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2"><i class="fa fa-check"></i></button>
+                </form>
+                {{/if}}
+
+                {{#if user.location}}
+                 <p class="card-text"><i class="fa fa-map-marker"></i>  {{user.location}}</p>
+                 {{else}}
+                 <form action="/addLocation" method="POST" class="form-inline">
+                <div class="form-group mb-2">
+                    <input type="text" class="form-control-plaintext" name="location"  placeholder="Enter location  " required>
                 </div>
                 <button type="submit" class="btn btn-primary mb-2"><i class="fa fa-check"></i></button>
                 </form>

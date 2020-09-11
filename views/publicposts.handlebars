@@ -1,0 +1,18 @@
+<div class="container">
+    {{#each posts}}
+    <div class="media">
+    <img src={{user.image}} class="mr-3" >
+        <div class="media-body">
+            <h3 class="mt-0">{{user.fullName}}</h3>
+                <h5>{{title}}</h5>
+                <h6>{{date}}</h6>
+                <p>{{body}}</p>
+         </div>
+    </div>
+
+{{else}}
+<p>
+    No posts yet!
+</p>
+{{/each}}
+</div>

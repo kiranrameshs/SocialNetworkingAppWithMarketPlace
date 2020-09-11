@@ -12,7 +12,10 @@ const session = require('express-session');
 
 // Connect to MongoURI exported from config
 const keys = require('./config/keys');
+
+//Collections
 const User = require('./models/user');
+const Post = require('./models/post');
 
 
 require('./passport/google-passport');
@@ -81,6 +84,22 @@ app.get('/auth/google/callback',
     res.redirect('/profile');
   });
 
+  //Handle all users route
+  app.get('/users',ensureAuthentication,(req,res)=>{
+    User.find({}).then((users) =>{
+      res.render('users', 
+      {users:users})
+    })
+});
+
+  //Display one user profile route
+  app.get('/user/:id',ensureAuthentication,(req,res)=>{
+    User.findById({_id: req.params.id}).then((user) =>{
+      res.render('user', 
+      {user:user})
+    })
+});
+
   //Handle profile route
   app.get('/profile',ensureAuthentication,(req,res)=>{
     User.findById({_id: req.user._id}).then
@@ -89,7 +108,7 @@ app.get('/auth/google/callback',
     })
 });
 
-//Handle email post route
+//Handle add email post route
 app.post('/addEmail',(req, res) =>{
   const email = req.body.email;
   User.findById({_id: req.user._id})
@@ -103,7 +122,7 @@ app.post('/addEmail',(req, res) =>{
   })
 })
 
-//Handle Phone number route
+//Handle add Phone number route
 app.post('/addPhone', (req, res) => {
   const phoneNumber = req.body.phone;
   User.findById({_id: req.user._id})
@@ -116,6 +135,59 @@ app.post('/addPhone', (req, res) => {
     })
   })
 })
+
+//Handle add location route
+app.post('/addLocation', (req, res) => {
+  const location = req.body.location;
+  User.findById({_id: req.user._id})
+  .then((user) =>
+  {
+    user.location = location;
+    user.save()
+    .then(() =>{
+      res.redirect('/profile');
+    })
+  })
+})
+
+
+//Handle add post route
+app.post('/savePost',(req, res) =>{
+  
+  var allowComments; 
+
+  if(req.body.allowComments){
+    allowComments = true
+  }
+  else{
+    allowComments = false
+  }
+
+  const newPost = {
+    title: req.body.title,
+    body: req.body.body, 
+    allowComments:allowComments,
+    status: req.body.status,
+    user: req.user._id
+  }
+  new Post(newPost).save().then(()=>
+  {
+    res.redirect('/posts');
+  });
+});
+
+//handle all posts route
+app.get('/posts',ensureAuthentication,(req,res)=>{
+    Post.find({status: 'public'})
+    .populate('user')
+    .sort({date: 'desc'}).then((posts)=>{
+      res.render('publicposts', {posts:posts});
+    });
+  });
+
+
+
+
 //Facebook Auth route
 app.get('/auth/facebook',
   passport.authenticate('facebook',{
@@ -128,6 +200,12 @@ app.get('/auth/facebook/callback',
     // Successful authentication, redirect home.
     res.redirect('/profile');
   });
+
+//Handle posts route
+app.get('/addpost', (req, res) =>
+{
+  res.render('addpost');
+});
 
 //Handle user logout
 app.get('/logout', (req, res) =>
