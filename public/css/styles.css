@@ -3,8 +3,9 @@
 }
 
 #signup{
-    text-align: right;
-    text-justify: distribute;
+    text-align: center;
+    text-justify: auto;
+   
 }
 .btn-facebook {
     background-color: #4aa1f3;
@@ -32,15 +33,7 @@
     background-color: #e44b34;
     color: #ffffff;
 }
-.btn-instagram{
-    background-color: rgb(195, 42, 163);
-    border-radius: 0%;
-    color: #ffffff;
-    width: auto;
-}
-.btn-instagram:link,
-.btn-instagram:visited{
-    text-decoration: none;
-    background-color:  rgb(195, 42, 163);
-    color: #ffffff;
+#main{
+    margin-top: 60px;
+    margin-bottom: 50px;
 }

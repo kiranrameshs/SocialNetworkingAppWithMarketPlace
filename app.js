@@ -17,6 +17,10 @@ const User = require('./models/user');
 
 require('./passport/google-passport');
 require('./passport/facebook-passport');
+
+//Link helpers
+const {ensureAuthentication,ensureGuest} = require('./helpers/auth');
+
 // Initialize application
 const app = express();
 
@@ -59,7 +63,7 @@ const port = process.env.PORT || 4000;
 
 
 // route for pages
-app.get('/',(req,res)=>{
+app.get('/',ensureGuest, (req,res)=>{
     res.render('home')});
 
 app.get('/about',(req,res)=>{
@@ -78,13 +82,40 @@ app.get('/auth/google/callback',
   });
 
   //Handle profile route
-  app.get('/profile',(req,res)=>{
+  app.get('/profile',ensureAuthentication,(req,res)=>{
     User.findById({_id: req.user._id}).then
     ((user) => {
       res.render('profile', {user:user});
     })
 });
 
+//Handle email post route
+app.post('/addEmail',(req, res) =>{
+  const email = req.body.email;
+  User.findById({_id: req.user._id})
+  .then((user) =>
+  {
+    user.email = email;
+    user.save()
+    .then(() =>{
+      res.redirect('/profile');
+    })
+  })
+})
+
+//Handle Phone number route
+app.post('/addPhone', (req, res) => {
+  const phoneNumber = req.body.phone;
+  User.findById({_id: req.user._id})
+  .then((user) =>
+  {
+    user.phoneNumber = phoneNumber;
+    user.save()
+    .then(() =>{
+      res.redirect('/profile');
+    })
+  })
+})
 //Facebook Auth route
 app.get('/auth/facebook',
   passport.authenticate('facebook',{
@@ -97,9 +128,6 @@ app.get('/auth/facebook/callback',
     // Successful authentication, redirect home.
     res.redirect('/profile');
   });
-
-
-  
 
 //Handle user logout
 app.get('/logout', (req, res) =>
