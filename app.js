@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const session = require('express-session');
+const methodOverride = require('method-override');
 
 
 // Connect to MongoURI exported from config
@@ -23,6 +24,7 @@ require('./passport/facebook-passport');
 
 //Link helpers
 const {ensureAuthentication,ensureGuest} = require('./helpers/auth');
+const { findOne } = require('./models/user');
 
 // Initialize application
 const app = express();
@@ -36,6 +38,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(methodOverride('_method'));
 
 //Global variables for User
 app.use( (req,res,next) => {
@@ -102,10 +105,14 @@ app.get('/auth/google/callback',
 
   //Handle profile route
   app.get('/profile',ensureAuthentication,(req,res)=>{
-    User.findById({_id: req.user._id}).then
-    ((user) => {
-      res.render('profile', {user:user});
-    })
+    Post.find({user: req.user._id})
+    .populate('user')
+    .sort({date:'desc'})
+    .then((posts) =>{
+      res.render('profile', {
+        posts:posts
+      });
+    });
 });
 
 //Handle add email post route
@@ -176,16 +183,88 @@ app.post('/savePost',(req, res) =>{
   });
 });
 
+
+//Handle edit post route
+app.get('/edit/Post/:id', (req, res) =>{
+  Post.findOne({_id: req.params.id})
+  .then((post) => {
+    res.render('editingpost', {
+      post:post
+    });
+  });
+});
+
+//Handle delete post route
+app.delete('/:id', (req, res) =>{
+  Post.remove({_id: req.params.id})
+  .then(() =>
+  {
+    res.redirect('/profile');
+  });
+});
+
+//Handle PUT route to save for edit post
+app.put('/editingpost/:id', (req, res) =>
+{
+  Post.findOne({_id: req.params.id})
+  .then((post) =>
+  {
+    var allowComments;
+    if(req.body.allowComments){
+      allowComments = true;
+    }else{
+      allowComments = false;
+    }
+    post.title = req.body.title;
+    post.body = req.body.body;
+    post.status = req.body.status;
+    post.allowComments = allowComments;
+    post.save()
+    .then(() =>{
+      res.redirect('/profile')
+    });
+  });
+});
+
 //handle all posts route
 app.get('/posts',ensureAuthentication,(req,res)=>{
     Post.find({status: 'public'})
     .populate('user')
+    .populate('comments.commentUser')
     .sort({date: 'desc'}).then((posts)=>{
       res.render('publicposts', {posts:posts});
     });
   });
 
+  //Handle add comment to public posts - save comments to database
+  app.post('/addComment/:id', (req, res) =>
+  {
+    Post.findOne({_id: req.params.id})
+    .then((post) =>{
+      const newComment = {
+        commentBody: req.body.commentbody,
+        commentUser: req.user._id
+      }
+      post.comments.push(newComment)
+      post.save()
+      .then(()=> {
+        res.redirect('/posts');
+      })
+    })
+  })
 
+//display single user all public posts
+app.get('/showposts/:id',(req, res) =>
+{
+  Post.find({user: req.params.id, status: 'public'})
+  .populate('user')
+  .sort({date: 'desc'})
+  .then((posts) => {
+      res.render('showposts', {
+        posts: posts
+      });
+  });
+});
 
 
 //Facebook Auth route

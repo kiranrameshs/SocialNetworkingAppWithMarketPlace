@@ -1,10 +1,24 @@
 <div class="container">
-    <div class="card" style="width: 18rem;">
-  <img src={{user.image}} class="card-img-top" >
-  <div class="card-body">
-    <h5 class="card-title">{{user.fullName}}</h5>
-    <p class="card-text"></p>
-    {{!-- <a href="#" class="btn btn-primary">Show Posts</a> --}}
+  <div class="row">
+    <div class="col-sm-3">
+      <div class="card">
+        <img src={{user.image}} class="card-img-top" >
+          <div class="card-body">
+            <h5 class="card-title">{{user.fullName}}</h5>
+            {{!-- <a href="#" class="btn btn-primary">Show Posts</a> --}}
+          </div>
+      </div>
+  </div>
+  <div class="col-sm-4">
+    <h1>Profile</h1>
+    <p>First name: <span class="red">{{user.firstname}}</span></p>
+    <p>Last name: <span class="red">{{user.lastname}}</span></p>
+    <p>Email: <span class="red">{{user.email}}</span></p>
+    {{#if user.location}}
+    <p>Location: <span class="red">{{user.location}}</span></p>
+    {{else}}
+    <p>Location: <span class="red">unknown</span></p>
+    {{/if}}
   </div>
 </div>
 </div>

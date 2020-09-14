@@ -43,3 +43,20 @@
 #address{
     color: green;
 }
+.post-user-pic{
+    height: 100px;
+    width: auto;
+}
+.status{
+    color: green;
+}
+.orange{
+    color: lightsalmon;
+}
+.commentUserImage{
+    height: 65px;
+    width: auto;
+}
+.red{
+    color: red;
+}
